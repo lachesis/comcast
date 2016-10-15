@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from __future__ import print_function
 import logging
 import os
 import re
