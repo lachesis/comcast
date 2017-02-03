@@ -1,9 +1,3 @@
-UGH
----
-Comcast broke this script by changing their layout. It looks like they now have
-some weird ASPX "Preloader" before they return any data in their HTML. I may try
-to script it again in the future, but it's broken for now.
-
 Comcast
 -------
 Comcast has recently implemented a data cap in my area. I wanted to track their

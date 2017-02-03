@@ -18,9 +18,9 @@ tfn=$(mktemp)
 python3 comcast.py > $tfn
 jq -c . $tfn >> $LONG_LOG
 
-used=$(jq -r '.usageMonths[-1].homeUsage' $tfn)
-total=$(jq -r '.usageMonths[-1].allowableUsage' $tfn)
-unit=$(jq -r '.usageMonths[-1].unitOfMeasure' $tfn)
+used=$(jq -r '.used' $tfn)
+total=$(jq -r '.total' $tfn)
+unit=$(jq -r '.unit' $tfn)
 
 [[ "$unit" == "MB" ]] && unit="MiB"
 [[ "$unit" == "GB" ]] && unit="GiB"
