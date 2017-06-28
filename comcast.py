@@ -48,7 +48,15 @@ try:
     res = session.get('https://customer.xfinity.com/apis/services/internet/usage')
     assert res.status_code == 200
 
-    print(res.text)
+    js = json.loads(res.text)
+
+    out = {
+        'raw': js,
+        'used': js['usageMonths'][-1]['homeUsage'],
+        'total': js['usageMonths'][-1]['allowableUsage'],
+        'unit': js['usageMonths'][-1]['unitOfMeasure'],
+    }
+    print(json.dumps(out))
 except Exception:
     logger.debug("Preloader HTML...")
     res = session.get('https://customer.xfinity.com/Secure/Preloading/?backTo=%2fMyServices%2fInternet%2fUsageMeter%2f')
