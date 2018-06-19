@@ -7,6 +7,17 @@ import sys
 import time
 import requests
 
+MAX_DAYS = 90
+def split_days(st, ed):
+    assert st < ed
+    p = st
+    while p < ed:
+        n = p + datetime.timedelta(MAX_DAYS)
+        if n > ed:
+            n = ed
+        yield p, n
+        p = n
+
 def main():
     logging.basicConfig(level=logging.DEBUG)
     sess = requests.Session()
@@ -57,7 +68,7 @@ def main():
     try:
         resp.raise_for_status()
     except Exception:
-        print(resp.text)
+        print(resp.text, file=sys.stderr)
         raise
     auid = resp.json()['fuelTypeServicePoint']['ELECTRICITY'][0]['accountUuid']
 
@@ -71,18 +82,28 @@ def main():
     except IndexError:
         end_date = (datetime.datetime.utcnow()).isoformat()
 
-    # get usage data
-    url = "https://pge.opower.com/ei/edge/apis/DataBrowser-v1/usage/utilityAccount/" + str(auid)
-    qs = {
-        "startDate":start_date,
-        "endDate":end_date,
-        "aggregateType":"hour",
-    }
-    resp = sess.get(url, params=qs, timeout=31)
-    resp.raise_for_status()
-    js = resp.json()
-    for r in js['reads']:
-        print(r['startTime'], r['value'])
+    try:
+        import dateutil.parser
+        st = dateutil.parser.parse(start_date)
+        ed = dateutil.parser.parse(end_date)
+        entries = [(s.isoformat(), e.isoformat()) for (s, e) in split_days(st, ed)]
+    except Exception:
+        print("Could not import dateutil.parser", file=sys.stderr)
+        entries = [(start_date, end_date)]
+
+    for s, e in entries:
+        # get usage data
+        url = "https://pge.opower.com/ei/edge/apis/DataBrowser-v1/usage/utilityAccount/" + str(auid)
+        qs = {
+            "startDate":s,
+            "endDate":e,
+            "aggregateType":"hour",
+        }
+        resp = sess.get(url, params=qs, timeout=31)
+        resp.raise_for_status()
+        js = resp.json()
+        for r in js['reads']:
+            print(r['startTime'], r['value'] * 1000)
 
 if __name__ == '__main__':
     main()

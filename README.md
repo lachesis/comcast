@@ -13,3 +13,16 @@ Usage
 ```bash
 COMCAST_USERNAME=bob COMCAST_PASSWORD=hope python3 comcast.py
 ```
+
+PGE
+---
+I also like tracking my home power usage. The PGE script allows that.
+
+It requires `requests` and optionally `dateutil` (to allow the script to
+automatically break long time intervals into multiple requests).
+
+Usage
+-----
+```bash
+PGE_USERNAME=bob PGE_PASSWORD=hope python3 pge.py
+```
